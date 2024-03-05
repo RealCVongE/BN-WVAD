@@ -3,3 +3,8 @@ wandb
 template.sh
 
 *.pyc
+
+*.mp4
+*.npy
+*.txt
+*.zip
