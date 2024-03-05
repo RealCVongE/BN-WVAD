@@ -59,16 +59,23 @@ class XDVideo(data.DataLoader):
         video_feature = np.load(os.path.join(self.feature_path, vid_name)).astype(np.float32)
 
         # 훈련 모드 전처리: 특징을 세그먼트 기반으로 샘플링
-        if self.mode == "Train":
+        if self.mode == "Train":  # 훈련 모드에서만 실행
             new_feature = np.zeros((self.num_segments, self.len_feature)).astype(np.float32)
+            # 세그먼트 수와 특징 길이에 맞춰 새로운 배열 생성
 
             sample_index = np.linspace(0, video_feature.shape[0], self.num_segments+1, dtype=np.uint16)
+            # 비디오 특징 길이를 세그먼트 수 + 1개의 지점으로 균등하게 분할하는 인덱스 생성
 
-            for i in range(len(sample_index)-1):
+            for i in range(len(sample_index)-1):  # 각 세그먼트에 대해
                 if sample_index[i] == sample_index[i+1]:
+                    # 샘플링 결과 동일한 인덱스가 발생하는 경우
                     new_feature[i,:] = video_feature[sample_index[i],:]
+                    # 동일한 인덱스의 특징 벡터를 사용
+
                 else:
+                    # 일반적인 경우: 두 인덱스 사이의 특징 평균 사용
                     new_feature[i,:] = video_feature[sample_index[i]:sample_index[i+1],:].mean(0)
-                    
-            video_feature = new_feature
+
+            video_feature = new_feature  # 원본 특징을 세그먼트 기반 특징으로 대체
+
         return video_feature, label    
