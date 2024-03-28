@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from dataset_loader import XDVideo
+from dataset_loader_ucf import UCFVideo
 from options import parse_args
 import pdb
 import utils
@@ -26,7 +27,8 @@ def get_predict(test_loader, net):
     # 테스트 데이터 로더를 반복적으로 처리
     load_iter = iter(test_loader)
     frame_predict = []
-
+    
+    
     for i in range(len(test_loader.dataset)//5):
         # 데이터 및 레이블 배치 가져오기
         _data, _label = next(load_iter)
@@ -35,7 +37,11 @@ def get_predict(test_loader, net):
         _data = _data.cuda()
         _label = _label.cuda()
 
+        #(5,67,1024)
+        #(5,120,1024)
         # 데이터를 신경망 모델에 입력
+        
+        #(5,67) 점수가 나옴
         res = net(_data)   
 
         # 출력을 NumPy 배열로 변환하고 세그먼트 평균 계산
@@ -45,7 +51,7 @@ def get_predict(test_loader, net):
         fpre_ = np.repeat(a_predict, 16)
         frame_predict.append(fpre_)
 
-    # 예측값 배열을 연결
+    # 예측값 배열을 연결 xd 데이터셋에서 800개 컨켓 => 2330384
     frame_predict = np.concatenate(frame_predict, axis=0)
     return frame_predict
 
@@ -63,7 +69,7 @@ def get_sub_metrics(frame_predict, frame_gt):
     """
 
     # 이상 윈도우 마스크 로드
-    anomaly_mask = np.load('frame_label/xd_anomaly_mask.npy')
+    anomaly_mask = np.load('frame_label/anomaly_mask_ucf.npy')
     sub_predict = frame_predict[anomaly_mask]
     sub_gt = frame_gt[anomaly_mask]
 
@@ -129,7 +135,7 @@ def test(net, test_loader, test_info, step, model_file = None):
             net.load_state_dict(torch.load(model_file))
 
         # 실제 레이블 로드
-        frame_gt = np.load("frame_label/xd_gt.npy")
+        frame_gt = np.load("frame_label/gt-ucf.npy")
 
         # 예측값 추출
         frame_predict = get_predict(test_loader, net)
@@ -156,7 +162,7 @@ if __name__ == "__main__":
     net = WSAD(args.len_feature, flag = "Test", args = args)
     net = net.cuda()
     test_loader = data.DataLoader(
-        XDVideo(root_dir = args.root_dir, mode = 'Test', num_segments = args.num_segments, len_feature = args.len_feature),
+        UCFVideo(root_dir = args.root_dir, mode = 'Test', num_segments = args.num_segments, len_feature = args.len_feature),
             batch_size = 5,
             shuffle = False, num_workers = args.num_workers,
             worker_init_fn = worker_init_fn)

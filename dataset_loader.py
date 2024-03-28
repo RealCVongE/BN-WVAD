@@ -58,7 +58,7 @@ class XDVideo(data.DataLoader):
         # 파일로부터 비디오 특징 로드
         video_feature = np.load(os.path.join(self.feature_path, vid_name)).astype(np.float32)
 
-        # 훈련 모드 전처리: 특징을 세그먼트 기반으로 샘플링
+        # 훈련 모드 전처리: 특징을 세그먼트 기반으로 샘플링 len_feature는 1024  num_segments는 16
         if self.mode == "Train":  # 훈련 모드에서만 실행
             new_feature = np.zeros((self.num_segments, self.len_feature)).astype(np.float32)
             # 세그먼트 수와 특징 길이에 맞춰 새로운 배열 생성
