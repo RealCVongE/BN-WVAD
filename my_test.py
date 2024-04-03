@@ -44,7 +44,7 @@ def test(net, test_loader, test_info, step, model_file = None):
             net.load_state_dict(torch.load(model_file))
 
         load_iter = iter(test_loader)
-        frame_gt = np.load("frame_label/my_gt.npy")
+        frame_gt = np.load("/home/bigdeal/mnt2/BN-WVAD/frame_label/my_gt_thresh_data.npy")
         
         frame_predicts = get_predicts(test_loader, net)
 

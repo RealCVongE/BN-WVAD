@@ -68,7 +68,7 @@ if __name__ == "__main__":
             worker_init_fn = worker_init_fn, drop_last = True)
     test_loader = data.DataLoader(
         XDVideo(root_dir = args.root_dir, mode = 'Test', num_segments = args.num_segments, len_feature = args.len_feature),
-            batch_size = 5,
+            batch_size = 1,
             shuffle = False, num_workers = args.num_workers,
             worker_init_fn = worker_init_fn)
 

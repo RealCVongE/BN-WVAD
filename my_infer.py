@@ -5,7 +5,7 @@ from options import parse_args
 import pdb
 import utils
 import os
-from models import WSAD
+from models.my_model import WSAD
 from tqdm import tqdm
 from dataset_loader_my import data
 from sklearn.metrics import roc_curve,auc,precision_recall_curve
@@ -31,7 +31,7 @@ def get_predict(test_loader, net):
     return frame_predict
 
 def get_sub_metrics(frame_predict, frame_gt):
-    anomaly_mask = np.load('frame_label/xd_anomaly_mask.npy')
+    anomaly_mask = np.load('/home/bigdeal/mnt2/BN-WVAD/frame_label/my_anomaly_mask_50_ab.npy')
     sub_predict = frame_predict[anomaly_mask]
     sub_gt = frame_gt[anomaly_mask]
     
@@ -64,7 +64,7 @@ def test(net, test_loader, test_info, step, model_file = None):
         if model_file is not None:
             net.load_state_dict(torch.load(model_file))
 
-        frame_gt = np.load("frame_label/xd_gt.npy")
+        frame_gt = np.load("/home/bigdeal/mnt2/BN-WVAD/frame_label/my_gt_over_data_50_ab.npy")
         
         frame_predict = get_predict(test_loader, net)
 

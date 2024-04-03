@@ -41,7 +41,6 @@ class myVideo(data.DataLoader):
 
     def get_data(self, index):
         vid_name = self.vid_list[index][0]
-        print(index)
         label=0
         if "normal" not in vid_name:
             label=1  
