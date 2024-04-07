@@ -31,7 +31,7 @@ def get_predict(test_loader, net):
     return frame_predict
 
 def get_sub_metrics(frame_predict, frame_gt):
-    anomaly_mask = np.load('/home/bigdeal/mnt2/BN-WVAD/frame_label/my_anomaly_mask_50_ab.npy')
+    anomaly_mask = np.load('/home/bigdeal/mnt2/BN-WVAD/frame_label/my_anomaly_mask_only_ab.npy')
     sub_predict = frame_predict[anomaly_mask]
     sub_gt = frame_gt[anomaly_mask]
     
@@ -64,7 +64,7 @@ def test(net, test_loader, test_info, step, model_file = None):
         if model_file is not None:
             net.load_state_dict(torch.load(model_file))
 
-        frame_gt = np.load("/home/bigdeal/mnt2/BN-WVAD/frame_label/my_gt_over_data_50_ab.npy")
+        frame_gt = np.load("/home/bigdeal/mnt2/BN-WVAD/frame_label/my_gt_over_data_only_ab.npy")
         
         frame_predict = get_predict(test_loader, net)
 
@@ -90,7 +90,8 @@ if __name__ == "__main__":
     net = net.cuda()
     test_loader = data.DataLoader(
         myVideo(root_dir = args.root_dir, mode = 'Test', num_segments = args.num_segments, len_feature = args.len_feature),
-            batch_size = 5,
+            # batch_size = 5,
+            batch_size = 1,
             shuffle = False, num_workers = args.num_workers,
             worker_init_fn = worker_init_fn)
     
