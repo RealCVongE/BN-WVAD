@@ -1,13 +1,10 @@
 import torch
 import numpy as np
-from dataset_loader_ljy import myVideo
-from options import parse_args
-import pdb
+# from options import parse_args
 import utils
 import os
-from models.my_model import WSAD
+from .models.my_model import WSAD
 from tqdm import tqdm
-from dataset_loader_my import data
 from sklearn.metrics import roc_curve,auc,precision_recall_curve
 import prettytable
 from torch.utils.data import DataLoader
@@ -34,8 +31,6 @@ def test(net, _data):
 
         return frame_predict
 def wvad_model_load(args):
-    if args.seed >= 0:
-        utils.set_seed(args.seed)
     net = WSAD(args.len_feature, flag = "Test", args = args)
     net = net.cuda()
     net.load_state_dict(torch.load(args.model_path))
@@ -47,6 +42,46 @@ def infer(args,net):
     video_feature =torch.from_numpy(video_feature).float().to("cuda:0")
     res = test(net, video_feature )
     return res
+def infer_numpy(net,video_feature):
+    video_feature= np.expand_dims(video_feature,axis=0)
+    video_feature =torch.from_numpy(video_feature).float().to("cuda:0")
+    res = test(net, video_feature )
+    return res
+from types import SimpleNamespace
+import os
+
+def parse_args():
+    descript = 'Pytorch Implementation of UR-DMU'
+    args = SimpleNamespace(
+        len_feature=1024,
+        root_dir='xd/',
+        log_path='/home/bigdeal/mnt2/workspace/mmaction2/bn_wvad/logs/',
+        model_path='/home/bigdeal/mnt2/BN-WVAD/ckpts/2024-04-03/my/train/my_best_2022_over.pkl',
+        lr='[0.0001]*1000',
+        batch_size=64,
+        num_workers=4,
+        num_segments=200,
+        seed=2022,
+        debug=False,
+        processed=False,
+        plot_freq=5,
+        weight_decay=0.00005,
+        version='train',
+        ratio_sample=0.2,
+        ratio_batch=0.4,
+        ratios=[16, 32],
+        kernel_sizes=[1, 1, 1]
+    )
+    return init_args(args)
+
+def init_args(args):
+    if not os.path.exists(args.model_path):
+        os.makedirs(args.model_path)
+    if not os.path.exists(args.log_path):
+        os.makedirs(args.log_path)
+    args.lr = eval(args.lr)
+    args.num_iters = len(args.lr)
+    return args
 
 if __name__ == "__main__":
     args = parse_args()
